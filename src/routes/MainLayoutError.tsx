@@ -24,7 +24,7 @@ export default function MainLayoutError() {
         }),
       )
     }
-    navigate("/transcribe", { replace: true })
+    navigate("/upload-file", { replace: true })
   }, [error, navigate])
 
   return null

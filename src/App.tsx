@@ -1,11 +1,11 @@
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom"
+import {createBrowserRouter, Navigate, RouterProvider} from "react-router-dom"
 import MainLayout from "./routes/MainLayout"
 import MainLayoutError from "./routes/MainLayoutError"
-import { mainSelector } from "./routes/mainSlice"
-import { useSelector } from "react-redux"
+import {mainSelector} from "./routes/mainSlice"
+import {useSelector} from "react-redux"
 import "@cloudscape-design/global-styles/index.css"
 import "./app.css"
-import { Fragment } from "react"
+import {Fragment} from "react"
 
 const router = createBrowserRouter([
   {
@@ -14,23 +14,13 @@ const router = createBrowserRouter([
     errorElement: <MainLayoutError/>,
     children: [
       {
-        path: "settings",
-        lazy: () => import("./routes/settings/SettingsRoute"),
-        handle: createCrumb("Settings", "/settings"),
-      },
-      {
-        path: "transcribe",
-        lazy: () => import("./routes/transcribe/SolflareSdkRoute"),
-        handle: createCrumb("SolflareSdk", "/transcribe"),
-      },
-      {
         path: "upload-file",
         lazy: () => import("./routes/upload-file/DemoRoute"),
         handle: createCrumb("Upload File", "/upload-file"),
       },
       {
         path: "*",
-        Component: () => <Navigate to="/transcribe"/>,
+        Component: () => <Navigate to="/upload-file"/>,
       }
     ],
   },

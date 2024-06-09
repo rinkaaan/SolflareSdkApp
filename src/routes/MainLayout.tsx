@@ -1,28 +1,28 @@
-import { AppLayout, Flashbar, SideNavigation, SideNavigationProps } from "@cloudscape-design/components"
-import { Navigate, Outlet, ScrollRestoration, UIMatch, useLocation, useMatches, useNavigate } from "react-router-dom"
-import { Fragment, useEffect, useState } from "react"
+import {
+  AppLayout,
+  Flashbar,
+  SideNavigation,
+  SideNavigationProps
+} from "@cloudscape-design/components"
+import {
+  Navigate,
+  Outlet,
+  ScrollRestoration,
+  UIMatch,
+  useLocation,
+  useMatches,
+  useNavigate
+} from "react-router-dom"
+import {Fragment, useEffect, useState} from "react"
 import CloudBreadcrumbGroup from "../components/CloudBreadcrumbGroup"
-import { useSelector } from "react-redux"
-import { appDispatch } from "../common/store"
-import { mainActions, mainSelector } from "./mainSlice"
-import { CrumbHandle } from "../App"
+import {useSelector} from "react-redux"
+import {appDispatch} from "../common/store"
+import {mainActions, mainSelector} from "./mainSlice"
+import {CrumbHandle} from "../App"
 
-import { prepareNotifications } from "../common/storeUtils"
-import { socketManager } from "../common/clients.ts"
-import { transcribeSelector } from "./transcribe/transcribeSlice.ts"
-import JoinMeetingModal from "./transcribe/components/JoinMeetingModal.tsx"
+import {prepareNotifications} from "../common/storeUtils"
 
 const items: SideNavigationProps.Item[] = [
-  {
-    type: "link",
-    text: "Home",
-    href: "/transcribe",
-  },
-  {
-    type: "link",
-    text: "Settings",
-    href: "/settings",
-  },
   {
     type: "link",
     text: "Upload File",
@@ -59,8 +59,7 @@ export default function MainLayout() {
   const matches = useMatches() as UIMatch<string, CrumbHandle>[]
   const crumbs = getCrumbs(matches)
   const [activeHref, setActiveHref] = useState<string | undefined>(undefined)
-  const { navigationOpen, notifications, startingPath, toolsOpen, tools, toolsHidden, username } = useSelector(mainSelector)
-  const { meetingCode } = useSelector(transcribeSelector)
+  const { navigationOpen, notifications, startingPath, toolsOpen, tools, toolsHidden } = useSelector(mainSelector)
 
   useEffect(() => {
     if (startingPath) {
@@ -79,15 +78,8 @@ export default function MainLayout() {
     }
   }, [crumbs])
 
-  useEffect(() => {
-    socketManager.joinRoom({ room: meetingCode, username })
-    return () => {
-      socketManager.leaveRoom({ room: meetingCode, username })
-    }
-  }, [])
-
   if (location.pathname === "/") {
-    return <Navigate to="/transcribe" replace/>
+    return <Navigate to="/upload-file" replace/>
   } else {
     return (
       <Fragment>
@@ -97,7 +89,7 @@ export default function MainLayout() {
             <SideNavigation
               header={{
                 text: "SolflareSdk",
-                href: "/transcribe",
+                href: "/upload-file",
               }}
               onFollow={e => {
                 e.preventDefault()
@@ -123,7 +115,6 @@ export default function MainLayout() {
             appDispatch(mainActions.updateSlice({ toolsOpen: e.detail.open }))
           }}
         />
-        <JoinMeetingModal />
       </Fragment>
     )
   }
