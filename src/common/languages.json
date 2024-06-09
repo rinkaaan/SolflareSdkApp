@@ -1,0 +1,42 @@
+{
+  "English": {
+    "web_speech_api_code": "en-US",
+    "google_translate_code": "en"
+  },
+  "French": {
+    "web_speech_api_code": "fr-FR",
+    "google_translate_code": "fr"
+  },
+  "German": {
+    "web_speech_api_code": "de-De",
+    "google_translate_code": "de"
+  },
+  "Italian": {
+    "web_speech_api_code": "it-IT",
+    "google_translate_code": "it"
+  },
+  "Japanese": {
+    "web_speech_api_code": "ja-JP",
+    "google_translate_code": "ja"
+  },
+  "Korean": {
+    "web_speech_api_code": "ko-KR",
+    "google_translate_code": "ko"
+  },
+  "Mandarin": {
+    "web_speech_api_code": "cmn-Hans-CN",
+    "google_translate_code": "zh"
+  },
+  "Cantonese": {
+    "web_speech_api_code": "yue-Hant-HK",
+    "google_translate_code": "zh"
+  },
+  "Russian": {
+    "web_speech_api_code": "ru-RU",
+    "google_translate_code": "ru"
+  },
+  "Spanish": {
+    "web_speech_api_code": "es-ES",
+    "google_translate_code": "es"
+  }
+}

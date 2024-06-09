@@ -1,0 +1,35 @@
+button {
+    user-select: none;
+}
+
+html, body {
+    overscroll-behavior-y: none;
+}
+
+.awsui_mobile-bar_1fj9k_1uvk8_49 {
+    top: env(safe-area-inset-top) !important;
+    left: env(safe-area-inset-left) !important;
+    right: env(safe-area-inset-right) !important;
+}
+
+#top-filler {
+    height: env(safe-area-inset-top);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #000716;
+    z-index: 6000;
+}
+
+.awsui_navigation-container_hyvsj_1tx15_672 {
+    top: env(safe-area-inset-top) !important;
+    left: env(safe-area-inset-left) !important;
+    right: env(safe-area-inset-right) !important;
+}
+
+#root {
+    padding-top: env(safe-area-inset-top) !important;
+    left: env(safe-area-inset-left) !important;
+    right: env(safe-area-inset-right) !important;
+}
+
