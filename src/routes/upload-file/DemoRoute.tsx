@@ -14,6 +14,7 @@ import {TOKEN_PROGRAM_ID} from "@solana/spl-token"
 import solanaPayButtonSvg from "../../assets/solana_pay.svg"
 import Link from "@cloudscape-design/components/link"
 import {sleep} from "../../common/typedUtils.ts"
+import PaymentTotalTable from "./PaymentTotalTable.tsx"
 
 const MINUTE_SECONDS = 60
 
@@ -84,7 +85,9 @@ export function Component() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft((prevTime) => prevTime - 1)
+      if (timeLeft > 0) {
+        setTimeLeft(timeLeft - 1)
+      }
     }, 1000)
 
     return () => {
@@ -103,21 +106,26 @@ export function Component() {
 
   const paymentPage = (
       <Container>
-        <TextContent>
-          <p>
-            To pay, scan the QR code below with your wallet or tap the Solana Pay button below if
-            you're on mobile and have a <Link external variant="secondary" href="https://docs.solanapay.com/#supporting-wallets"> Solana Pay compatible wallet</Link> such as Solflare installed.
-          </p>
-        </TextContent>
-        <SpaceBetween size="xxxs" direction="vertical" alignItems="center">
-          <div ref={qrCodeRef}/>
-          <SpaceBetween size="m" direction="vertical" alignItems="center">
-            <a href={paymentUrl!} rel="noreferrer">
-              <img src={solanaPayButtonSvg} alt="Pay"/>
-            </a>
-            <TextContent>
-              <p>{formatTime(timeLeft)} left to send payment...</p>
-            </TextContent>
+        <SpaceBetween size="m" direction="vertical">
+          <TextContent>
+            <p>
+              Please make sure you have a <Link external variant="secondary" href="https://docs.solanapay.com/#supporting-wallets"> Solana Pay compatible wallet</Link> such as Solflare installed on your phone with enough USDC to make the payment.
+            </p>
+            <p>
+              To pay, scan the QR code below with your phone or tap the Solana Pay button below if you're already viewing this page on your phone.
+            </p>
+          </TextContent>
+          <PaymentTotalTable />
+          <SpaceBetween size="xxxs" direction="vertical" alignItems="center">
+            <div ref={qrCodeRef}/>
+            <SpaceBetween size="m" direction="vertical" alignItems="center">
+              <a href={paymentUrl!} rel="noreferrer" className=".no-select">
+                <img src={solanaPayButtonSvg} alt="Pay"/>
+              </a>
+              <TextContent>
+                <p>{formatTime(timeLeft)} left to send payment...</p>
+              </TextContent>
+            </SpaceBetween>
           </SpaceBetween>
         </SpaceBetween>
       </Container>

@@ -33,3 +33,7 @@ html, body {
     right: env(safe-area-inset-right) !important;
 }
 
+.no-select * {
+    user-select: none;
+}
+
