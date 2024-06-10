@@ -12,7 +12,6 @@ import BigNumber from "bignumber.js"
 import {createQR, encodeURL, validateTransfer} from "@solana/pay"
 import {TOKEN_PROGRAM_ID} from "@solana/spl-token"
 import solanaPayButtonSvg from "../../assets/solana_pay.svg"
-import Link from "@cloudscape-design/components/link"
 import {sleep} from "../../common/typedUtils.ts"
 import PaymentTotalTable from "./PaymentTotalTable.tsx"
 
@@ -129,19 +128,16 @@ export function Component() {
         <SpaceBetween size="m" direction="vertical">
           <TextContent>
             <p>
-              Please install <Link external variant="secondary"
-                                   href="https://solflare.com/">Solflare</Link> on your phone and
-              purchase USDC in the wallet or from an exchange such as Coinbase.
+              Please install a Solana Pay compatible wallet on your phone and purchase USDC in the wallet or from an exchange such as Coinbase.
             </p>
             <p>
-              To pay, scan the QR code below with your phone or tap the Solana Pay button below from
-              your phone's browser.
+              To pay, scan the QR code from the app in your phone or tap the Solana Pay button below from your phone's browser.
             </p>
             <p>
-              Using Solflare is strongly recommended for its security, Solana Pay support, and ease of use.
+              Using Phantom or Solflare is strongly recommended for their security, Solana Pay support, and ease of use.
             </p>
             <p>
-              Make sure you have enough UDSC (1 USDC is 1 dollar) to cover the transfer and also at least a few cents worth of SOL for the network transaction fee.
+              Make sure you have enough UDSC (1 USDC is 1 dollar) to cover the transfer and a few cents worth of SOL for the network transaction fee.
             </p>
           </TextContent>
           <PaymentTotalTable/>
