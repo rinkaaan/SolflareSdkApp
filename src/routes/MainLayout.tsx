@@ -59,7 +59,7 @@ export default function MainLayout() {
   const matches = useMatches() as UIMatch<string, CrumbHandle>[]
   const crumbs = getCrumbs(matches)
   const [activeHref, setActiveHref] = useState<string | undefined>(undefined)
-  const { navigationOpen, notifications, startingPath, toolsOpen, tools, toolsHidden } = useSelector(mainSelector)
+  const { navigationOpen, notifications, startingPath} = useSelector(mainSelector)
 
   useEffect(() => {
     if (startingPath) {
@@ -108,9 +108,7 @@ export default function MainLayout() {
           notifications={
             <Flashbar items={prepareNotifications(notifications)}/>
           }
-          tools={tools}
-          toolsOpen={toolsOpen}
-          toolsHide={toolsHidden}
+          toolsHide
           onToolsChange={(e) => {
             appDispatch(mainActions.updateSlice({ toolsOpen: e.detail.open }))
           }}
