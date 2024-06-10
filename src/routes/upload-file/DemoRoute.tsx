@@ -14,6 +14,7 @@ import {TOKEN_PROGRAM_ID} from "@solana/spl-token"
 import solanaPayButtonSvg from "../../assets/solana_pay.svg"
 import {sleep} from "../../common/typedUtils.ts"
 import PaymentTotalTable from "./PaymentTotalTable.tsx"
+import Link from "@cloudscape-design/components/link"
 
 const MINUTE_SECONDS = 60
 const RECIPIENT_PUBKEY = new PublicKey("5mPfmMbZ7wHFL1sG2EuAW1DBSKxSDDVuSmEZCqQQhF8x")
@@ -128,21 +129,23 @@ export function Component() {
         <SpaceBetween size="m" direction="vertical">
           <TextContent>
             <p>
-              Please install a Solana Pay compatible wallet on your phone and purchase USDC in the wallet or from an exchange such as Coinbase.
+              Please install a <Link external variant="secondary" href="https://docs.solanapay.com/#supporting-wallets">Solana Pay compatible wallet</Link> on your phone and purchase USDC in the wallet or from an exchange such as Coinbase.
             </p>
             <p>
-              To pay, scan the QR code from the app in your phone or tap the Solana Pay button below from your phone's browser.
+              The Phantom or Solflare wallets are strongly recommended for their security, Solana Pay support, and ease of use.
             </p>
             <p>
-              Using Phantom or Solflare is strongly recommended for their security, Solana Pay support, and ease of use.
+              To pay, scan the QR code from the app in your phone or tap the Solana Pay button below
+              from your phone's browser.
             </p>
             <p>
-              Make sure you have enough UDSC (1 USDC is 1 dollar) to cover the transfer and a few cents worth of SOL for the network transaction fee.
+              Make sure you have enough UDSC (1 USDC is 1 dollar) to cover the transfer and a few
+              cents worth of SOL for the network transaction fee.
             </p>
           </TextContent>
           <PaymentTotalTable/>
           <SpaceBetween size="xxxs" direction="vertical" alignItems="center">
-          <div ref={qrCodeRef}/>
+            <div ref={qrCodeRef}/>
             <SpaceBetween size="m" direction="vertical" alignItems="center">
               <a href={paymentUrl!} rel="noreferrer" className=".no-select">
                 <img src={solanaPayButtonSvg} alt="Pay"/>
