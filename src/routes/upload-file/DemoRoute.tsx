@@ -9,7 +9,7 @@ import {
 import {useEffect, useRef, useState} from "react"
 import {Connection, Keypair, PublicKey} from "@solana/web3.js"
 import BigNumber from "bignumber.js"
-import {createQR, encodeURL} from "@solana/pay"
+import {createQR, encodeURL, validateTransfer} from "@solana/pay"
 import {TOKEN_PROGRAM_ID} from "@solana/spl-token"
 import solanaPayButtonSvg from "../../assets/solana_pay.svg"
 import Link from "@cloudscape-design/components/link"
@@ -31,16 +31,37 @@ export function Component() {
   const connection = loader()
   const [paymentSuccess, setPaymentSuccess] = useState(false)
 
-  async function getLatestTransaction() {
-    const result = await connection!.getSignaturesForAddress(reference, undefined, "confirmed")
-    return result.length > 0 ? result[0] : null
+  async function isTxConfirmed() {
+    const sigs = await connection!.getSignaturesForAddress(reference, undefined, "confirmed")
+    if (sigs.length == 0) {
+      return false
+    }
+    // const transaction = await connection!.getTransaction(sigs[0].signature, {
+    //   commitment: "confirmed",
+    //   maxSupportedTransactionVersion: 0
+    // })
+    // console.info(transaction?.transaction)
+    await validateTransfer(connection, sigs[0].signature, {
+      recipient: new PublicKey("nkDyvnuXzjGH9dv1jwpWg8u3sRoTqdfL2zU1R38YUke"),
+      amount: new BigNumber(.01),
+      reference,
+      splToken: USDC_PUBKEY,
+    }, {
+      commitment: "confirmed"
+    })
+    return true
   }
 
   async function retryUntilSuccess() {
     while (timeLeft > 0 && !paymentSuccess) {
-      const latestTransaction = await getLatestTransaction()
-      console.info(latestTransaction)
-      if (latestTransaction) {
+      // const latestTransaction = await getLatestTransaction()
+      // console.info(latestTransaction)
+      // if (latestTransaction) {
+      //   setPaymentSuccess(true)
+      //   return
+      // }
+      const txConfirmed = await isTxConfirmed()
+      if (txConfirmed) {
         setPaymentSuccess(true)
         return
       }
@@ -50,7 +71,7 @@ export function Component() {
 
   useEffect(() => {
     retryUntilSuccess()
-  }, [])
+  }, [paymentSuccess])
 
   function findAssociatedTokenAddress(
       walletAddress: PublicKey
@@ -73,8 +94,7 @@ export function Component() {
       amount: new BigNumber(.01),
       splToken: USDC_PUBKEY,
       reference,
-      label: "Rinkagu",
-      message: "Usage fee for 1 month"
+      memo: "Rinkagu",
     })
     setPaymentUrl(paymentUrl.href)
     const qrCode = createQR(paymentUrl, 200)
@@ -86,7 +106,7 @@ export function Component() {
   useEffect(() => {
     const interval = setInterval(() => {
       if (timeLeft > 0) {
-        setTimeLeft(timeLeft - 1)
+        setTimeLeft((prevTimeLeft) => prevTimeLeft - 1)
       }
     }, 1000)
 
