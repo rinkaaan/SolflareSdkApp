@@ -17,6 +17,9 @@ import {sleep} from "../../common/typedUtils.ts"
 import PaymentTotalTable from "./PaymentTotalTable.tsx"
 
 const MINUTE_SECONDS = 60
+const RECIPIENT_PUBKEY = new PublicKey("5mPfmMbZ7wHFL1sG2EuAW1DBSKxSDDVuSmEZCqQQhF8x")
+const USDC_PUBKEY = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
+const SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID = new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",)
 
 export function loader() {
   const endpoint = import.meta.env.VITE_ALCHEMY_MAINNET_URL
@@ -42,7 +45,7 @@ export function Component() {
     // })
     // console.info(transaction?.transaction)
     await validateTransfer(connection, sigs[0].signature, {
-      recipient: new PublicKey("nkDyvnuXzjGH9dv1jwpWg8u3sRoTqdfL2zU1R38YUke"),
+      recipient: RECIPIENT_PUBKEY,
       amount: new BigNumber(.01),
       reference,
       splToken: USDC_PUBKEY,
@@ -87,7 +90,7 @@ export function Component() {
   }
 
   useEffect(() => {
-    const toTokenAccount = findAssociatedTokenAddress(new PublicKey("nkDyvnuXzjGH9dv1jwpWg8u3sRoTqdfL2zU1R38YUke"))
+    const toTokenAccount = findAssociatedTokenAddress(RECIPIENT_PUBKEY)
 
     const paymentUrl = encodeURL({
       recipient: toTokenAccount,
@@ -113,10 +116,7 @@ export function Component() {
     return () => {
       clearInterval(interval)
     }
-  }, [])
-
-  const USDC_PUBKEY = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
-  const SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID = new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",)
+  }, [timeLeft])
 
   function formatTime(seconds) {
     const minutes = Math.floor(seconds / 60)
@@ -129,15 +129,24 @@ export function Component() {
         <SpaceBetween size="m" direction="vertical">
           <TextContent>
             <p>
-              Please make sure you have a <Link external variant="secondary" href="https://docs.solanapay.com/#supporting-wallets"> Solana Pay compatible wallet</Link> such as Solflare installed on your phone with enough USDC to make the payment.
+              Please install <Link external variant="secondary"
+                                   href="https://solflare.com/">Solflare</Link> on your phone and
+              purchase USDC in the wallet or from an exchange such as Coinbase.
             </p>
             <p>
-              To pay, scan the QR code below with your phone or tap the Solana Pay button below if you're already viewing this page on your phone.
+              To pay, scan the QR code below with your phone or tap the Solana Pay button below from
+              your phone's browser.
+            </p>
+            <p>
+              Using Solflare is strongly recommended for its security, Solana Pay support, and ease of use.
+            </p>
+            <p>
+              Make sure you have enough UDSC (1 USDC is 1 dollar) to cover the transfer and also at least a few cents worth of SOL for the network transaction fee.
             </p>
           </TextContent>
-          <PaymentTotalTable />
+          <PaymentTotalTable/>
           <SpaceBetween size="xxxs" direction="vertical" alignItems="center">
-            <div ref={qrCodeRef}/>
+          <div ref={qrCodeRef}/>
             <SpaceBetween size="m" direction="vertical" alignItems="center">
               <a href={paymentUrl!} rel="noreferrer" className=".no-select">
                 <img src={solanaPayButtonSvg} alt="Pay"/>
