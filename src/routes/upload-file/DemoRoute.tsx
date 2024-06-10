@@ -1,4 +1,5 @@
 import {
+  Alert,
   Container,
   ContentLayout,
   Header,
@@ -6,18 +7,49 @@ import {
   TextContent
 } from "@cloudscape-design/components"
 import {useEffect, useRef, useState} from "react"
-import {appDispatch} from "../../common/store.ts"
-import {mainActions} from "../mainSlice.ts"
-import {Keypair, PublicKey} from "@solana/web3.js"
+import {Connection, Keypair, PublicKey} from "@solana/web3.js"
 import BigNumber from "bignumber.js"
 import {createQR, encodeURL} from "@solana/pay"
 import {TOKEN_PROGRAM_ID} from "@solana/spl-token"
 import solanaPayButtonSvg from "../../assets/solana_pay.svg"
 import Link from "@cloudscape-design/components/link"
+import {sleep} from "../../common/typedUtils.ts"
+
+const MINUTE_SECONDS = 60
+
+export function loader() {
+  const endpoint = import.meta.env.VITE_ALCHEMY_MAINNET_URL
+  return new Connection(endpoint)
+}
 
 export function Component() {
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null)
   const qrCodeRef = useRef<HTMLDivElement>(null)
+  const reference = new Keypair().publicKey
+  const [timeLeft, setTimeLeft] = useState(5 * MINUTE_SECONDS)
+  const connection = loader()
+  const [paymentSuccess, setPaymentSuccess] = useState(false)
+
+  async function getLatestTransaction() {
+    const result = await connection!.getSignaturesForAddress(reference, undefined, "confirmed")
+    return result.length > 0 ? result[0] : null
+  }
+
+  async function retryUntilSuccess() {
+    while (timeLeft > 0 && !paymentSuccess) {
+      const latestTransaction = await getLatestTransaction()
+      console.info(latestTransaction)
+      if (latestTransaction) {
+        setPaymentSuccess(true)
+        return
+      }
+      await sleep(5000)
+    }
+  }
+
+  useEffect(() => {
+    retryUntilSuccess()
+  }, [])
 
   function findAssociatedTokenAddress(
       walletAddress: PublicKey
@@ -34,7 +66,6 @@ export function Component() {
 
   useEffect(() => {
     const toTokenAccount = findAssociatedTokenAddress(new PublicKey("nkDyvnuXzjGH9dv1jwpWg8u3sRoTqdfL2zU1R38YUke"))
-    const reference = new Keypair().publicKey
 
     const paymentUrl = encodeURL({
       recipient: toTokenAccount,
@@ -51,15 +82,57 @@ export function Component() {
     }
   }, [])
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft((prevTime) => prevTime - 1)
+    }, 1000)
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [])
+
   const USDC_PUBKEY = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
   const SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID = new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",)
 
-  useEffect(() => {
-    appDispatch(mainActions.updateSlice({tools: undefined, toolsHidden: false}))
-    return () => {
-      appDispatch(mainActions.updateSlice({toolsHidden: true}))
-    }
-  }, [])
+  function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`
+  }
+
+  const paymentPage = (
+      <Container>
+        <TextContent>
+          <p>
+            To pay, scan the QR code below with your wallet or tap the Solana Pay button below if
+            you're on mobile and have a <Link external variant="secondary" href="https://docs.solanapay.com/#supporting-wallets"> Solana Pay compatible wallet</Link> such as Solflare installed.
+          </p>
+        </TextContent>
+        <SpaceBetween size="xxxs" direction="vertical" alignItems="center">
+          <div ref={qrCodeRef}/>
+          <SpaceBetween size="m" direction="vertical" alignItems="center">
+            <a href={paymentUrl!} rel="noreferrer">
+              <img src={solanaPayButtonSvg} alt="Pay"/>
+            </a>
+            <TextContent>
+              <p>{formatTime(timeLeft)} left to send payment...</p>
+            </TextContent>
+          </SpaceBetween>
+        </SpaceBetween>
+      </Container>
+  )
+
+  const paymentSuccessPage = (
+      <Container>
+        <Alert
+          statusIconAriaLabel="Success"
+          type="success"
+        >
+          Payment successful! You can close this page now.
+        </Alert>
+      </Container>
+  )
 
   return (
       <ContentLayout
@@ -67,19 +140,8 @@ export function Component() {
             <Header variant="h1">Billing</Header>
           }
       >
-        <Container>
-          <TextContent>
-            <p>
-              To pay, scan the QR code below with your wallet or tap the Solana Pay button below if you're on mobile and have a <Link external variant="secondary" href="https://docs.solanapay.com/#supporting-wallets"> Solana Pay compatible wallet</Link> such as Solflare installed.
-            </p>
-          </TextContent>
-          <SpaceBetween size="xxxs" direction="vertical" alignItems="center">
-            <div ref={qrCodeRef}/>
-            <a href={paymentUrl!} rel="noreferrer">
-              <img src={solanaPayButtonSvg} alt="Pay"/>
-            </a>
-          </SpaceBetween>
-        </Container>
+        {!paymentSuccess && paymentPage}
+        {paymentSuccess && paymentSuccessPage}
       </ContentLayout>
   )
 }
